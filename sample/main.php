@@ -57,9 +57,9 @@ echo str_repeat("-", 40) . "\n";
 $em2 = \fastorm\Entity\Manager::getInstance();
 
 try {
-    $countryRepository = $em2->getRepository('City');
-    $results = $countryRepository->hydrate(
-        $countryRepository->query(
+    $cityRepository = $em2->getRepository('City');
+    $results = $cityRepository->hydrate(
+        $cityRepository->query(
             "select * from T_CITY_CIT as c inner join T_COUNTRY_COU as co on (c.cou_code = co.cou_code) limit 3"
         )
     );
@@ -71,3 +71,7 @@ try {
 } catch (Exception $e) {
     var_dump($e->getMessage());
 }
+
+echo str_repeat("-", 40) . "\n";
+$countryRepository = $em2->getRepository('Country');
+var_dump($countryRepository->get('FRA'));
