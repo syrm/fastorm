@@ -40,6 +40,19 @@ class Hydrator implements \Iterator
     }
 
 
+    public function first()
+    {
+        $this->valid();
+        $objects = $this->current();
+
+        if (count($objects) > 0) {
+            return reset($objects);
+        }
+
+        return null;
+    }
+
+
     /** iterator **/
 
     public function rewind()
