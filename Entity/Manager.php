@@ -11,51 +11,15 @@ class Manager
     protected $cacheDirectory = null;
     protected $connectionList = array();
     protected $metadataList = array();
+    protected $tabletoClass = null;
 
 
-    protected function __construct()
+    protected function __construct(array $config)
     {
 
-    }
-
-
-    public static function getInstance()
-    {
-
-        if (self::$instance === null) {
-            self::$instance = new self();
-        }
-
-        return self::$instance;
-    }
-
-
-    public function setModelDirectory($path)
-    {
-        $this->modelDirectory = $path;
-    }
-
-
-    public function setCacheDirectory($path)
-    {
-        $this->cacheDirectory = $path;
-    }
-
-
-    public function getCacheDirectory()
-    {
-        return $this->cacheDirectory;
-    }
-
-
-    public function loadConnection($connections)
-    {
-        $this->connectionConfig = $connections;
-    }
-
-
-    public function generateCache()
-    {
+        $this->connectionConfig = $config['connections'];
+        $this->cacheDirectory = $config['cacheDirectory'];
+        $this->modelDirectory = $config['modelDirectory'];
 
         if (file_exists($this->cacheDirectory . DIRECTORY_SEPARATOR . 'table-to-metadata.php') === false) {
             $fileHandler = fopen($this->cacheDirectory . DIRECTORY_SEPARATOR . 'table-to-metadata.php', 'a+');
@@ -75,6 +39,35 @@ class Manager
 
             fclose($fileHandler);
         }
+
+        $this->tableToClass = require($this->cacheDirectory . DIRECTORY_SEPARATOR . 'table-to-metadata.php');
+    }
+
+
+    public static function getInstance(array $config = array())
+    {
+
+        if (self::$instance === null) {
+            if (count($config) === 0) {
+                throw new \Exception('First call to EntityManager must pass configuration in parameters');
+            }
+
+            self::$instance = new self($config);
+        }
+
+        return self::$instance;
+    }
+
+
+    public function getClass($table)
+    {
+        return $this->tableToClass->__invoke($table);
+    }
+
+
+    public function loadConnection($connections)
+    {
+        $this->connectionConfig = $connections;
     }
 
 

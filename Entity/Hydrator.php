@@ -9,17 +9,12 @@ class Hydrator implements \Iterator
     protected $metadataList = array();
     protected $result = null;
     protected $targets = array();
-    protected $repositoryName = null;
 
 
     public function __construct(Repository $entityRepository, $result)
     {
         $this->entityManager = $entityRepository->getEntityManager();
         $this->result = $result;
-        $this->repositoryName = require(
-            $this->entityManager->getCacheDirectory()
-            . DIRECTORY_SEPARATOR . 'table-to-metadata.php'
-        );
 
         $tableToLoad = array();
         foreach ($this->result->fetchFields() as $field) {
@@ -36,7 +31,7 @@ class Hydrator implements \Iterator
 
         foreach ($tableToLoad as $table) {
             if (isset($this->_metadata[$table]) === false) {
-                $entityName = $this->repositoryName->__invoke($table);
+                $entityName = $this->entityManager->getClass($table);
                 if ($entityName !== null) {
                     $this->metadataList[$table] = $this->entityManager->loadMetadata($entityName);
                 }
@@ -83,7 +78,7 @@ class Hydrator implements \Iterator
         foreach ($this->targets as $alias => $columns) {
             foreach ($columns as $i => $column) {
                 if (isset($objects[$alias]) === false) {
-                    $entityName = $this->repositoryName->__invoke($column['table']);
+                    $entityName = $this->entityManager->getClass($column['table']);
                     if ($entityName === null) {
                         continue;
                     }
