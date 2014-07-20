@@ -9,6 +9,7 @@ class Metadata
     protected $databaseName = null;
     protected $table = null;
     protected $fields = array();
+    protected $primary = array();
 
 
     public function __construct($entityName, $directory)
@@ -61,6 +62,16 @@ class Metadata
         }
 
         $this->fields[$params['columnName']] = $params;
+
+        if (isset($params['id']) === true && $params['id'] === true) {
+            $this->primary = array('field' => $params['fieldName'], 'column' => $params['columnName']);
+        }
+    }
+
+
+    public function getPrimary()
+    {
+        return $this->primary;
     }
 
 
