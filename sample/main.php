@@ -21,11 +21,11 @@ $connections = array(
     ),
 );
 
-$em = \fastorm\Entity\Manager::getInstance();
-$em->loadConnection($connections);
-$em->setModelDirectory(ROOT . '/sample/model');
-$em->setCacheDirectory(ROOT . '/sample/tmp');
-$em->generateCache();
+$em = \fastorm\Entity\Manager::getInstance(array(
+    'connections' => $connections,
+    'modelDirectory' => ROOT . '/sample/model',
+    'cacheDirectory' => ROOT . '/sample/tmp'
+));
 
 try {
     $cityRepository = $em->getRepository('City');
@@ -54,9 +54,10 @@ try {
 }
 
 echo str_repeat("-", 40) . "\n";
+$em2 = \fastorm\Entity\Manager::getInstance();
 
 try {
-    $countryRepository = $em->getRepository('City');
+    $countryRepository = $em2->getRepository('City');
     $results = $countryRepository->hydrate(
         $countryRepository->query(
             "select * from T_CITY_CIT as c inner join T_COUNTRY_COU as co on (c.cou_code = co.cou_code) limit 3"
