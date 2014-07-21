@@ -51,7 +51,7 @@ class Country
     }
 
 
-    public function getRegion($region)
+    public function getRegion()
     {
         return (string) $this->region;
     }
