@@ -22,7 +22,8 @@ class Repository
 
     public function get($primaryKeyValue)
     {
-        $className = get_called_class();
+
+        $className = get_class($this);
         $entityName = str_replace('Repository', '', $className);
         $metadata = $this->em->loadMetadata($entityName);
         $primaryColumn = $metadata->getPrimary()['column'];
@@ -36,7 +37,7 @@ class Repository
 
     public function query($queryString, $params = array())
     {
-        return $this->em->doQuery(get_called_class(), $queryString, $params);
+        return $this->em->doQuery(get_class($this), $queryString, $params);
     }
 
 
