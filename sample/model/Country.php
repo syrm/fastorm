@@ -17,7 +17,7 @@ class Country
 
     public function getCode()
     {
-        return (string) $code;
+        return (string) $this->code;
     }
 
 
@@ -29,7 +29,7 @@ class Country
 
     public function getName()
     {
-        return (string) $name;
+        return (string) $this->name;
     }
 
 

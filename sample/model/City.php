@@ -42,7 +42,7 @@ class City
 
     public function getCountryCode()
     {
-        return (string) $countryCode;
+        return (string) $this->countryCode;
     }
 
 
