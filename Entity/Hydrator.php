@@ -17,7 +17,7 @@ class Hydrator implements \Iterator
         $this->result = $result;
 
         $tableToLoad = array();
-        foreach ($this->result->fetchFields() as $field) {
+        foreach ($this->result->fetchFields() as $index => $field) {
             if (isset($this->targets[$field->table]) === false) {
                 $this->targets[$field->table] = array();
             }
@@ -26,7 +26,7 @@ class Hydrator implements \Iterator
                 $tableToLoad[] = $field->orgtable;
             }
 
-            $this->targets[$field->table][] = array('name' => $field->orgname, 'table' => $field->orgtable);
+            $this->targets[$field->table][] = array('name' => $field->orgname, 'table' => $field->orgtable, 'index' => $index);
         }
 
         foreach ($tableToLoad as $table) {
@@ -101,7 +101,7 @@ class Hydrator implements \Iterator
                 $fields = $this->metadataList[$column['table']]->getFields();
                 if (isset($fields[$column['name']]['fieldName']) === true) {
                     $propertyName = 'set' . ucfirst($fields[$column['name']]['fieldName']);
-                    $objects[$alias]->$propertyName($this->_iteratorCurrent[$i]);
+                    $objects[$alias]->$propertyName($this->_iteratorCurrent[$column['index']]);
                 }
             }
         }
