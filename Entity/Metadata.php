@@ -10,12 +10,20 @@ class Metadata
     protected $table = null;
     protected $fields = array();
     protected $primary = array();
+    protected $rootEntityName = null;
 
 
     public function __construct($entityName, $directory)
     {
+        $this->rootEntityName = $entityName;
         $metadata = $this;
         require_once $directory . '/Metadata' . $entityName . '.php';
+    }
+
+
+    public function getRootEntityName()
+    {
+        return $this->rootEntityName;
     }
 
 
