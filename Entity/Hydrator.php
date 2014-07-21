@@ -6,14 +6,17 @@ class Hydrator implements \Iterator
 {
 
     protected $entityManager = null;
+    protected $unitOfWork = null;
     protected $metadataList = array();
     protected $result = null;
     protected $targets = array();
+    protected $primary = array();
 
 
     public function __construct(Repository $entityRepository, $result)
     {
         $this->entityManager = $entityRepository->getEntityManager();
+        $this->unitOfWork = $this->entityManager->getUnitOfWork();
         $this->result = $result;
 
         $tableToLoad = array();
@@ -23,17 +26,19 @@ class Hydrator implements \Iterator
             }
 
             if (in_array($field->orgtable, $tableToLoad) === false) {
-                $tableToLoad[] = $field->orgtable;
+                $tableToLoad[$field->table] = $field->orgtable;
             }
 
-            $this->targets[$field->table][] = array('name' => $field->orgname, 'table' => $field->orgtable, 'index' => $index);
+            $this->targets[$field->table][$field->orgname] = array('table' => $field->orgtable, 'index' => $index);
         }
 
-        foreach ($tableToLoad as $table) {
+        foreach ($tableToLoad as $alias => $table) {
             if (isset($this->_metadata[$table]) === false) {
                 $entityName = $this->entityManager->getClass($table);
                 if ($entityName !== null) {
                     $this->metadataList[$table] = $this->entityManager->loadMetadata($entityName);
+                    $primary = $this->metadataList[$table]->getPrimary();
+                    $this->primary[$alias] = $this->targets[$alias][$primary['column']]['index'];
                 }
             }
         }
@@ -89,7 +94,17 @@ class Hydrator implements \Iterator
         $objects = array();
 
         foreach ($this->targets as $alias => $columns) {
-            foreach ($columns as $column) {
+            $primaryColumn = array_values($columns)[$this->primary[$alias]];
+            $class = $this->entityManager->getClass($primaryColumn['table']);
+
+            $entity = $this->unitOfWork->getEntityFromIdentityMap($class, $this->_iteratorCurrent[$this->primary[$alias]]);
+
+            if ($entity !== null) {
+                $objects[$alias] = $entity;
+                continue;
+            }
+
+            foreach ($columns as $columnName => $column) {
                 if (isset($objects[$alias]) === false) {
                     $entityName = $this->entityManager->getClass($column['table']);
                     if ($entityName === null) {
@@ -99,11 +114,13 @@ class Hydrator implements \Iterator
                 }
 
                 $fields = $this->metadataList[$column['table']]->getFields();
-                if (isset($fields[$column['name']]['fieldName']) === true) {
-                    $propertyName = 'set' . ucfirst($fields[$column['name']]['fieldName']);
+                if (isset($fields[$columnName]['fieldName']) === true) {
+                    $propertyName = 'set' . ucfirst($fields[$columnName]['fieldName']);
                     $objects[$alias]->$propertyName($this->_iteratorCurrent[$column['index']]);
                 }
             }
+
+            $this->unitOfWork->addToIdentityMap($objects[$alias]);
         }
 
         return $objects;

@@ -12,6 +12,7 @@ class Manager
     protected $connectionList = array();
     protected $metadataList = array();
     protected $tabletoClass = null;
+    protected $unitOfWork = null;
 
 
     protected function __construct(array $config)
@@ -41,6 +42,7 @@ class Manager
         }
 
         $this->tableToClass = require($this->cacheDirectory . DIRECTORY_SEPARATOR . 'table-to-metadata.php');
+        $this->unitOfWork = new \fastorm\UnitOfWork($this);
     }
 
 
@@ -71,6 +73,12 @@ class Manager
     }
 
 
+    public function getUnitOfWork()
+    {
+        return $this->unitOfWork;
+    }
+
+
     public function getRepository($entityName)
     {
 
@@ -83,7 +91,6 @@ class Manager
 
     public function loadMetadata($entityName)
     {
-
         if (isset($this->metadataList[$entityName]) === true) {
             return $this->metadataList[$entityName];
         }
