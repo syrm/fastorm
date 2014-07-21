@@ -50,18 +50,19 @@ try {
 
 echo str_repeat("-", 40) . "\n";
 $em2 = \fastorm\Entity\Manager::getInstance();
-
+$store = array();
 try {
     $cityRepository = $em2->getRepository('City');
     $results = $cityRepository->hydrate(
         $cityRepository->query(
-            "select * from T_CITY_CIT as c inner join T_COUNTRY_COU as co on (c.cou_code = co.cou_code) where co.cou_code = :code limit 3",
+            "select * from T_CITY_CIT as c inner join T_COUNTRY_COU as co on (c.cou_code != co.cou_code) where co.cou_code = :code limit 3000",
             array('code' => 'FRA')
         )
     );
 
     foreach ($results as $result) {
         var_dump($result);
+        $store[] = $result;
         echo str_repeat("-", 40) . "\n";
     }
 } catch (Exception $e) {
@@ -71,3 +72,6 @@ try {
 echo str_repeat("-", 40) . "\n";
 $countryRepository = $em2->getRepository('Country');
 var_dump($countryRepository->get('FRA'));
+
+echo str_repeat("-", 40) . "\n";
+echo "\n" . round(memory_get_peak_usage()/1024) . "ko\n";
