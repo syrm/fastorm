@@ -1,16 +1,11 @@
 <?php
 
-define('ROOT', realpath(__DIR__ . DIRECTORY_SEPARATOR . '..'));
+require_once __DIR__ . '/../Autoloader.php';
 
-require_once ROOT . '/SplClassLoader.php';
-
-$classLoader = new \fastorm\SplClassLoader('fastorm', ROOT . DIRECTORY_SEPARATOR . '..');
-$classLoader->register();
-
-require_once 'model\City.php';
-require_once 'model\CityRepository.php';
-require_once 'model\Country.php';
-require_once 'model\CountryRepository.php';
+require_once 'model/City.php';
+require_once 'model/CityRepository.php';
+require_once 'model/Country.php';
+require_once 'model/CountryRepository.php';
 
 $connections = array(
     'main' => array(
@@ -23,8 +18,8 @@ $connections = array(
 
 $em = \fastorm\Entity\Manager::getInstance(array(
     'connections' => $connections,
-    'modelDirectory' => ROOT . '/sample/model',
-    'cacheDirectory' => ROOT . '/sample/tmp'
+    'modelDirectory' =>  __DIR__ . '/model',
+    'cacheDirectory' =>  __DIR__ . '/tmp'
 ));
 
 try {
@@ -60,7 +55,8 @@ try {
     $cityRepository = $em2->getRepository('City');
     $results = $cityRepository->hydrate(
         $cityRepository->query(
-            "select * from T_CITY_CIT as c inner join T_COUNTRY_COU as co on (c.cou_code = co.cou_code) limit 3"
+            "select * from T_CITY_CIT as c inner join T_COUNTRY_COU as co on (c.cou_code = co.cou_code) where co.cou_code = :code limit 3",
+            array('code' => 'FRA')
         )
     );
 
