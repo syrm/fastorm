@@ -89,7 +89,7 @@ class Hydrator implements \Iterator
         $objects = array();
 
         foreach ($this->targets as $alias => $columns) {
-            foreach ($columns as $i => $column) {
+            foreach ($columns as $column) {
                 if (isset($objects[$alias]) === false) {
                     $entityName = $this->entityManager->getClass($column['table']);
                     if ($entityName === null) {
