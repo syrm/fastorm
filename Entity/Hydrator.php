@@ -9,6 +9,8 @@ class Hydrator implements \Iterator
     protected $metadataList = array();
     protected $result = null;
     protected $targets = array();
+    protected $iteratorPosition = 0;
+    protected $iteratorCurrent = null;
 
 
     public function __construct(Repository $entityRepository, $result)
@@ -26,11 +28,15 @@ class Hydrator implements \Iterator
                 $tableToLoad[] = $field->orgtable;
             }
 
-            $this->targets[$field->table][] = array('name' => $field->orgname, 'table' => $field->orgtable, 'index' => $index);
+            $this->targets[$field->table][] = array(
+                'name' => $field->orgname,
+                'table' => $field->orgtable,
+                'index' => $index
+            );
         }
 
         foreach ($tableToLoad as $table) {
-            if (isset($this->_metadata[$table]) === false) {
+            if (isset($this->metadataList[$table]) === false) {
                 $entityName = $this->entityManager->getClass($table);
                 if ($entityName !== null) {
                     $this->metadataList[$table] = $this->entityManager->loadMetadata($entityName);
@@ -59,17 +65,17 @@ class Hydrator implements \Iterator
     {
 
         $this->result->dataSeek(0);
-        $this->_iteratorPosition = 0;
+        $this->iteratorPosition = 0;
     }
 
 
     public function valid()
     {
 
-        $this->_iteratorPosition++;
-        $this->_iteratorCurrent = $this->result->fetchArray();
+        $this->iteratorPosition++;
+        $this->iteratorCurrent = $this->result->fetchArray();
 
-        if ($this->_iteratorCurrent !== null) {
+        if ($this->iteratorCurrent !== null) {
             return true;
         }
 
@@ -79,7 +85,7 @@ class Hydrator implements \Iterator
 
     public function key()
     {
-        return $this->_iteratorPosition;
+        return $this->iteratorPosition;
     }
 
 
@@ -101,7 +107,7 @@ class Hydrator implements \Iterator
                 $fields = $this->metadataList[$column['table']]->getFields();
                 if (isset($fields[$column['name']]['fieldName']) === true) {
                     $propertyName = 'set' . ucfirst($fields[$column['name']]['fieldName']);
-                    $objects[$alias]->$propertyName($this->_iteratorCurrent[$column['index']]);
+                    $objects[$alias]->$propertyName($this->iteratorCurrent[$column['index']]);
                 }
             }
         }
