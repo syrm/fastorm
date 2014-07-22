@@ -8,10 +8,10 @@ class Mysqli implements \fastorm\Adapter\Database
     protected $connection;
 
 
-    public function connect($hostname, $username, $password)
+    public function connect($hostname, $username, $password, $port)
     {
 
-        $this->connection = new \mysqli($hostname, $username, $password);
+        $this->connection = new \mysqli($hostname, $username, $password, null, $port);
 
         if (mysqli_connect_error()) {
             throw new \Exception('Connect Error (' . mysqli_connect_errno() . ') '. mysqli_connect_error());

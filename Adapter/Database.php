@@ -5,7 +5,7 @@ namespace fastorm\Adapter;
 interface Database
 {
 
-    public function connect($hostname, $username, $password);
+    public function connect($hostname, $username, $password, $port);
     public function setDatabase($database);
     public function prepare($sql);
     public function escape($value);
