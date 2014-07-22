@@ -118,7 +118,7 @@ class Manager
             }
 
             $this->connectionList[$metadata->getConnection()] = $databaseHandler;
-            $databaseHandler->connect($connection['host'], $connection['user'], $connection['password']);
+            $databaseHandler->connect($connection['host'], $connection['user'], $connection['password'], $connection['port']);
             $databaseHandler->setDatabase($metadata->getDatabase());
         } else {
             $databaseHandler = $this->connectionList[$metadata->getConnection()];
