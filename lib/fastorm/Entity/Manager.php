@@ -9,7 +9,7 @@ class Manager
     protected $connectionConfig = null;
     protected $connectionList = array();
     protected $metadataList = array();
-    protected $tabletoClass = array();
+    protected $tableToClass = array();
 
 
     protected function __construct(array $config)
