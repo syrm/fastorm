@@ -10,7 +10,7 @@ require '../vendor/autoload.php';
 $connections = array(
     'main' => array(
         'type'     => 'mysql',
-        'host'     => 'bouh.org',
+        'host'     => 'localhost',
         'user'     => 'world_sample',
         'password' => 'world_sample',
         'port'     => 3306
