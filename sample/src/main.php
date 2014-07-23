@@ -1,29 +1,30 @@
 <?php
 
-require_once __DIR__ . '/../Autoloader.php';
+namespace sample;
 
-require_once 'model/City.php';
-require_once 'model/CityRepository.php';
-require_once 'model/Country.php';
-require_once 'model/CountryRepository.php';
+// fastorm autoloader
+require '../../vendor/autoload.php';
+// sample autoloader
+require '../vendor/autoload.php';
 
 $connections = array(
     'main' => array(
         'type'     => 'mysql',
-        'host'     => 'localhost',
+        'host'     => 'bouh.org',
         'user'     => 'world_sample',
-        'password' => 'world_sample'
+        'password' => 'world_sample',
+        'port'     => 3306
     ),
 );
 
 $em = \fastorm\Entity\Manager::getInstance(array(
     'connections' => $connections,
     'modelDirectory' =>  __DIR__ . '/model',
-    'cacheDirectory' =>  __DIR__ . '/tmp'
+    'cacheDirectory' =>  __DIR__ . '/../tmp'
 ));
 
 try {
-    $cityRepository = $em->getRepository('City');
+    $cityRepository = $em->getRepository('\sample\model\City');
     $results = $cityRepository->getZCountryWithLotsPopulation();
 
     foreach ($results as $result) {
@@ -37,7 +38,7 @@ try {
 echo str_repeat("-", 40) . "\n";
 
 try {
-    $countryRepository = $em->getRepository('Country');
+    $countryRepository = $em->getRepository('\sample\model\Country');
     $results = $countryRepository->hydrate($countryRepository->query("select * from T_COUNTRY_COU as b limit 3"));
 
     foreach ($results as $result) {
@@ -52,7 +53,7 @@ echo str_repeat("-", 40) . "\n";
 $em2 = \fastorm\Entity\Manager::getInstance();
 
 try {
-    $cityRepository = $em2->getRepository('City');
+    $cityRepository = $em2->getRepository('\sample\model\City');
     $results = $cityRepository->hydrate(
         $cityRepository->query(
             "select * from T_CITY_CIT as c inner join T_COUNTRY_COU as co on (c.cou_code = co.cou_code) where co.cou_code = :code limit 3",
@@ -69,5 +70,5 @@ try {
 }
 
 echo str_repeat("-", 40) . "\n";
-$countryRepository = $em2->getRepository('Country');
+$countryRepository = $em2->getRepository('\sample\model\Country');
 var_dump($countryRepository->get('FRA'));

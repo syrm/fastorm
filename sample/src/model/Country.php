@@ -1,5 +1,7 @@
 <?php
 
+namespace sample\model;
+
 class Country
 {
 
