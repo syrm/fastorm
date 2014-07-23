@@ -39,7 +39,7 @@ class Hydrator implements \Iterator
             if (isset($this->metadataList[$table]) === false) {
                 $entityName = $this->entityManager->getClass($table);
                 if ($entityName !== null) {
-                    $this->metadataList[$table] = $this->entityManager->loadMetadata($entityName);
+                    $this->metadataList[$table] = $this->entityManager->loadMetadata($entityName . 'Repository');
                 }
             }
         }
