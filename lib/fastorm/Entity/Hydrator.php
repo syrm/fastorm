@@ -13,7 +13,7 @@ class Hydrator implements \Iterator
     protected $iteratorCurrent = null;
 
 
-    public function __construct(Repository $entityRepository, $result)
+    public function __construct(Repository $entityRepository, \fastorm\Adapter\DatabaseResult $result)
     {
         $this->entityManager = $entityRepository->getEntityManager();
         $this->result = $result;
