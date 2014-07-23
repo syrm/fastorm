@@ -88,8 +88,8 @@ class Manager
                 case 'mysql':
                     $databaseHandler = new \fastorm\Adapter\Driver\Mysqli\Mysqli();
                     break;
-                case 'postgresql':
-                    throw new \RuntimeException('Postgresql handler not found');
+                default:
+                    throw new \RuntimeException($connection['type'] . ' handler not found');
                     break;
             }
 
