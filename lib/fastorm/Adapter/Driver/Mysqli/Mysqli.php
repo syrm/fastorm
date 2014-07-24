@@ -2,19 +2,24 @@
 
 namespace fastorm\Adapter\Driver\Mysqli;
 
+use fastorm\Adapter\Driver\DriverException;
+use fastorm\Adapter\Driver\PreparedQueryException;
+
 class Mysqli implements \fastorm\Adapter\Database
 {
-
+    /**
+     * @var \mysqli $connection
+     */
     protected $connection;
 
 
     public function connect($hostname, $username, $password, $port)
     {
-
-        $this->connection = new \mysqli($hostname, $username, $password, null, $port);
-
-        if (mysqli_connect_error()) {
-            throw new \Exception('Connect Error (' . mysqli_connect_errno() . ') '. mysqli_connect_error());
+        mysqli_report(MYSQLI_REPORT_STRICT);
+        try{
+            $this->connection = new \mysqli($hostname, $username, $password, null, $port);
+        }Catch(\mysqli_sql_exception $e){
+            throw new DriverException('Connect Error : '.$e->getMessage(), $e->getCode());
         }
 
         return $this;
@@ -27,7 +32,7 @@ class Mysqli implements \fastorm\Adapter\Database
         $this->connection->select_db($database);
 
         if ($this->error() !== false) {
-            throw new \Exception('Select database error : ' . $this->error());
+            throw new DriverException('Select database error : ' . $this->error(), $this->connection->errno);
         }
     }
 
@@ -63,10 +68,10 @@ class Mysqli implements \fastorm\Adapter\Database
             $sql
         );
 
-        $mysqliStatement = $this->connection->prepare($sql);
-
-        if ($mysqliStatement === false) {
-            return false;
+        try{
+            $mysqliStatement = $this->connection->prepare($sql);
+        }catch(\mysqli_sql_exception $e){
+            throw new PreparedQueryException($e->getMessage(), $e->getCode());
         }
 
         $statement = new Statement($mysqliStatement);
