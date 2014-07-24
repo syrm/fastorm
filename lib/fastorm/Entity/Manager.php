@@ -7,40 +7,14 @@ class Manager
 
     protected static $instance = null;
     protected $connectionConfig = null;
-    protected $modelDirectory = null;
-    protected $cacheDirectory = null;
     protected $connectionList = array();
     protected $metadataList = array();
-    protected $tabletoClass = null;
+    protected $tableToClass = array();
 
 
     protected function __construct(array $config)
     {
-
         $this->connectionConfig = $config['connections'];
-        $this->cacheDirectory = $config['cacheDirectory'];
-        $this->modelDirectory = $config['modelDirectory'];
-
-        if (file_exists($this->cacheDirectory . DIRECTORY_SEPARATOR . 'table-to-metadata.php') === false) {
-            $fileHandler = fopen($this->cacheDirectory . DIRECTORY_SEPARATOR . 'table-to-metadata.php', 'a+');
-            fputs($fileHandler, "<?php\nreturn function (\$table) {\n    \$tables = array();\n");
-
-            foreach (glob($this->modelDirectory . DIRECTORY_SEPARATOR . 'Metadata*.php') as $file) {
-                $entityName = str_replace('Metadata', '', basename($file, '.php'));
-                $entityMetadata = $this->loadMetadata($entityName);
-                fputs($fileHandler, "    \$tables['" . $entityMetadata->getTable() . "'] = '" . $entityName . "';\n");
-            }
-
-            fputs(
-                $fileHandler,
-                "    if (isset(\$tables[\$table]) === false) {\n"
-                . "        return null;\n    }\n    return \$tables[\$table];\n};\n"
-            );
-
-            fclose($fileHandler);
-        }
-
-        $this->tableToClass = require($this->cacheDirectory . DIRECTORY_SEPARATOR . 'table-to-metadata.php');
     }
 
 
@@ -61,7 +35,12 @@ class Manager
 
     public function getClass($table)
     {
-        return $this->tableToClass->__invoke($table);
+
+        if (isset($this->tableToClass[$table]) === false) {
+            return null;
+        }
+
+        return $this->tableToClass[$table];
     }
 
 
@@ -73,33 +52,30 @@ class Manager
 
     public function getRepository($entityName)
     {
-
-        $this->loadMetadata($entityName);
         $className = $entityName . 'Repository';
-
         return new $className($this);
     }
 
 
-    public function loadMetadata($entityName)
+    public function loadMetadata($repositoryName)
     {
 
+        $entityName = str_replace('Repository', '', $repositoryName);
         if (isset($this->metadataList[$entityName]) === true) {
             return $this->metadataList[$entityName];
         }
 
-        $this->metadataList[$entityName] = new Metadata($entityName, $this->modelDirectory);
+        $this->metadataList[$entityName] = $repositoryName::loadMetadata(new Metadata());
+        $this->tableToClass[$this->metadataList[$entityName]->getTable()] = $entityName;
 
         return $this->metadataList[$entityName];
     }
 
 
-    public function doQuery($className, $queryString, $params = array())
+    public function doQuery($repository, $queryString, $params = array())
     {
 
-        $entityName = str_replace('Repository', '', $className);
-
-        $metadata = $this->loadMetadata($entityName);
+        $metadata = $this->loadMetadata($repository);
 
         if (isset($this->connectionConfig[$metadata->getConnection()]) === false) {
             throw new \RuntimeException(sprintf('Connection "%s" not found', $metadata->getConnection()));
@@ -112,8 +88,8 @@ class Manager
                 case 'mysql':
                     $databaseHandler = new \fastorm\Adapter\Driver\Mysqli\Mysqli();
                     break;
-                case 'postgresql':
-                    throw new \RuntimeException('Postgresql handler not found');
+                default:
+                    throw new \RuntimeException($connection['type'] . ' handler not found');
                     break;
             }
 

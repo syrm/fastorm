@@ -12,13 +12,6 @@ class Metadata
     protected $primary = array();
 
 
-    public function __construct($entityName, $directory)
-    {
-        $metadata = $this;
-        require_once $directory . '/Metadata' . $entityName . '.php';
-    }
-
-
     public function setConnection($connectionName)
     {
         $this->connectionName = $connectionName;

@@ -13,7 +13,7 @@ class Hydrator implements \Iterator
     protected $iteratorCurrent = null;
 
 
-    public function __construct(Repository $entityRepository, $result)
+    public function __construct(Repository $entityRepository, \fastorm\Adapter\DatabaseResult $result)
     {
         $this->entityManager = $entityRepository->getEntityManager();
         $this->result = $result;
@@ -39,7 +39,7 @@ class Hydrator implements \Iterator
             if (isset($this->metadataList[$table]) === false) {
                 $entityName = $this->entityManager->getClass($table);
                 if ($entityName !== null) {
-                    $this->metadataList[$table] = $this->entityManager->loadMetadata($entityName);
+                    $this->metadataList[$table] = $this->entityManager->loadMetadata($entityName . 'Repository');
                 }
             }
         }
