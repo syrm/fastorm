@@ -69,9 +69,13 @@ class Metadata
         return $this->primary;
     }
 
-
     public function getFields()
     {
         return $this->fields;
+    }
+
+    public function getFieldsName()
+    {
+        return array_map(function($field){return $field['columnName'];}, $this->fields);
     }
 }

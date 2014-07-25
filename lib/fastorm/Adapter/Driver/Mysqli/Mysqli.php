@@ -12,6 +12,10 @@ class Mysqli implements Database
      * @var \mysqli $connection
      */
     protected $connection;
+    /**
+     * @var bool
+     */
+    protected $connected = false;
 
 
     public function connect($hostname, $username, $password, $port)
@@ -21,6 +25,7 @@ class Mysqli implements Database
 
         try{
             $this->connection = new \mysqli($hostname, $username, $password, null, $port);
+            $this->connected = true;
         }Catch(\mysqli_sql_exception $e){
             throw new DriverException('Connect Error : '.$e->getMessage(), $e->getCode());
         }
@@ -104,5 +109,17 @@ class Mysqli implements Database
     public function getErrorMessage()
     {
         return $this->connection->error;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function getConnected()
+    {
+        return $this->connected;
+    }
+
+    public function protectFieldName($field){
+        return '`'.$field.'`';
     }
 }

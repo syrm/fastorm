@@ -34,7 +34,12 @@ class Repository
         $entityName = str_replace('Repository', '', $className);
         $metadata = $this->em->loadMetadata($entityName);
         $primaryColumn = $metadata->getPrimary()['column'];
-        $sql = 'SELECT * FROM ' . $metadata->getTable() . ' WHERE ' . $primaryColumn . ' = :id LIMIT 1';
+        $fields = $metadata->getFieldsName();
+        $databaseHandler = $this->em->getDatabaseHandler($metadata);
+        $fields = array_map(array($databaseHandler, 'protectFieldName'), $fields);
+
+        $sql = 'SELECT '.$databaseHandler->protectFieldName($primaryColumn).', '.implode(', ', $fields).' FROM ' . $metadata->getTable() .
+            ' WHERE ' . $databaseHandler->protectFieldName($primaryColumn) . ' = :id LIMIT 1';
 
         return $this->hydrate(
             $this->em->doQuery($className, $sql, array('id' => $primaryKeyValue))

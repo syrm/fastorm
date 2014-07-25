@@ -101,30 +101,10 @@ class Manager
             throw new DriverException(sprintf('Connection "%s" not found', $metadata->getConnection()));
         }
 
-        $connection = $this->connectionConfig[$metadata->getConnection()];
-
-        if (isset($this->connectionList[$metadata->getConnection()]) === false) {
-            switch ($connection['type']) {
-                case 'mysql':
-                    $databaseHandler = new \fastorm\Adapter\Driver\Mysqli\Mysqli();
-                    break;
-                default:
-                    throw new DriverException($connection['type'] . ' handler not found');
-                    break;
-            }
-
-            $this->connectionList[$metadata->getConnection()] = $databaseHandler;
-            $databaseHandler->connect(
-                $connection['host'],
-                $connection['user'],
-                $connection['password'],
-                $connection['port']
-            );
-            $databaseHandler->setDatabase($metadata->getDatabase());
-        } else {
-            $databaseHandler = $this->connectionList[$metadata->getConnection()];
+        $databaseHandler = $this->getDatabaseHandler($metadata);
+        if ($databaseHandler->getConnected() === false) {
+            $this->connectAndSetDatabase($metadata);
         }
-
         $stmt = $databaseHandler->prepare($queryString);
 
         if (count($params) > 0) {
@@ -144,5 +124,40 @@ class Manager
         $result = $stmt->getResult();
 
         return $result;
+    }
+
+    public function getDatabaseHandler(Metadata $metadata){
+        $connection = $this->connectionConfig[$metadata->getConnection()];
+
+        if (isset($this->connectionList[$metadata->getConnection()]) === false) {
+            switch ($connection['type']) {
+                case 'mysql':
+                    $databaseHandler = new \fastorm\Adapter\Driver\Mysqli\Mysqli();
+                    break;
+                default:
+                    throw new DriverException($connection['type'] . ' handler not found');
+                    break;
+            }
+
+            $this->connectionList[$metadata->getConnection()] = $databaseHandler;
+        } else {
+            $databaseHandler = $this->connectionList[$metadata->getConnection()];
+        }
+        return $databaseHandler;
+    }
+
+    /**
+     * @param Metadata $metadata
+     */
+    private function connectAndSetDatabase(Metadata $metadata){
+        $connection = $this->connectionConfig[$metadata->getConnection()];
+        $databaseHandler = $this->getDatabaseHandler($metadata);
+        $databaseHandler->connect(
+            $connection['host'],
+            $connection['user'],
+            $connection['password'],
+            $connection['port']
+        );
+        $databaseHandler->setDatabase($metadata->getDatabase());
     }
 }
