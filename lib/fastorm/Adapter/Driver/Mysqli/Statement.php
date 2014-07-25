@@ -2,6 +2,8 @@
 
 namespace fastorm\Adapter\Driver\Mysqli;
 
+use fastorm\Adapter\Driver\NoResultException;
+
 class Statement implements \fastorm\Adapter\DatabaseStatement
 {
 
@@ -34,25 +36,32 @@ class Statement implements \fastorm\Adapter\DatabaseStatement
         call_user_func_array(array($this->statement, 'bind_param'), $values);
     }
 
-
+    /**
+     * @return bool
+     */
     public function execute()
     {
         return $this->statement->execute();
     }
 
-
+    /**
+     * @return int
+     */
     public function getAffectedRows()
     {
         return $this->statement->affected_rows;
     }
 
-
+    /**
+     * @return Result
+     * @throws \fastorm\Adapter\Driver\NoResultException
+     */
     public function getResult()
     {
 
         $result = $this->statement->get_result();
         if ($result === false) {
-            return null;
+            throw new NoResultException();
         }
 
         return new Result($result);

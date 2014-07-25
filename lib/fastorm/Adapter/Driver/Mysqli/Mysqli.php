@@ -2,10 +2,11 @@
 
 namespace fastorm\Adapter\Driver\Mysqli;
 
+use fastorm\Adapter\Database;
 use fastorm\Adapter\Driver\DriverException;
-use fastorm\Adapter\Driver\PreparedQueryException;
+use fastorm\Adapter\Driver\QueryException;
 
-class Mysqli implements \fastorm\Adapter\Database
+class Mysqli implements Database
 {
     /**
      * @var \mysqli $connection
@@ -15,7 +16,9 @@ class Mysqli implements \fastorm\Adapter\Database
 
     public function connect($hostname, $username, $password, $port)
     {
-        mysqli_report(MYSQLI_REPORT_STRICT);
+        $driver = new \mysqli_driver();
+        $driver->report_mode = MYSQLI_REPORT_STRICT;
+
         try{
             $this->connection = new \mysqli($hostname, $username, $password, null, $port);
         }Catch(\mysqli_sql_exception $e){
@@ -68,10 +71,10 @@ class Mysqli implements \fastorm\Adapter\Database
             $sql
         );
 
-        try{
-            $mysqliStatement = $this->connection->prepare($sql);
-        }catch(\mysqli_sql_exception $e){
-            throw new PreparedQueryException($e->getMessage(), $e->getCode());
+        $mysqliStatement = $this->connection->prepare($sql);
+
+        if($mysqliStatement === false){
+            QueryException::throwException($sql, $this);
         }
 
         $statement = new Statement($mysqliStatement);

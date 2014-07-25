@@ -2,9 +2,13 @@
 
 namespace fastorm\Entity;
 
+use fastorm\Adapter\DatabaseResult;
+
 class Repository
 {
-
+    /**
+     * @var Manager
+     */
     protected $em;
 
 
@@ -19,7 +23,10 @@ class Repository
         return $this->em;
     }
 
-
+    /**
+     * @param $primaryKeyValue
+     * @return mixed|null
+     */
     public function get($primaryKeyValue)
     {
 
@@ -34,14 +41,21 @@ class Repository
         )->first();
     }
 
-
+    /**
+     * @param string $queryString
+     * @param array $params
+     * @return \fastorm\Adapter\DatabaseResult
+     */
     public function query($queryString, $params = array())
     {
         return $this->em->doQuery(get_class($this), $queryString, $params);
     }
 
-
-    public function hydrate($result)
+    /**
+     * @param \fastorm\Adapter\DatabaseResult $result
+     * @return Hydrator
+     */
+    public function hydrate(DatabaseResult $result)
     {
         return new Hydrator($this, $result);
     }

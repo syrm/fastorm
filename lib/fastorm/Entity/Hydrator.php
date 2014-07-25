@@ -2,6 +2,8 @@
 
 namespace fastorm\Entity;
 
+use fastorm\Adapter\DatabaseResult;
+
 class Hydrator implements \Iterator
 {
 
@@ -13,7 +15,7 @@ class Hydrator implements \Iterator
     protected $iteratorCurrent = null;
 
 
-    public function __construct(Repository $entityRepository, \fastorm\Adapter\DatabaseResult $result)
+    public function __construct(Repository $entityRepository, DatabaseResult $result)
     {
         $this->entityManager = $entityRepository->getEntityManager();
         $this->result = $result;
@@ -118,6 +120,6 @@ class Hydrator implements \Iterator
 
     public function next()
     {
-
+        /** @todo */
     }
 }

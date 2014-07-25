@@ -2,6 +2,11 @@
 
 namespace fastorm\Entity;
 
+use fastorm\Adapter\Driver\DriverException;
+use fastorm\Adapter\Driver\PreparedQueryException;
+use fastorm\Adapter\Driver\QueryException;
+use fastorm\Exception;
+
 class Manager
 {
 
@@ -23,7 +28,7 @@ class Manager
 
         if (self::$instance === null) {
             if (count($config) === 0) {
-                throw new \Exception('First call to EntityManager must pass configuration in parameters');
+                throw new Exception('First call to EntityManager must pass configuration in parameters');
             }
 
             self::$instance = new self($config);
@@ -32,7 +37,10 @@ class Manager
         return self::$instance;
     }
 
-
+    /**
+     * @param $table
+     * @return Model
+     */
     public function getClass($table)
     {
 
@@ -49,14 +57,20 @@ class Manager
         $this->connectionConfig = $connections;
     }
 
-
+    /**
+     * @param $entityName
+     * @return Repository
+     */
     public function getRepository($entityName)
     {
         $className = $entityName . 'Repository';
         return new $className($this);
     }
 
-
+    /**
+     * @param $repositoryName
+     * @return Metadata
+     */
     public function loadMetadata($repositoryName)
     {
 
@@ -71,14 +85,20 @@ class Manager
         return $this->metadataList[$entityName];
     }
 
-
+    /**
+     * @param string $repository
+     * @param string $queryString
+     * @param array $params
+     * @return \fastorm\Adapter\Driver\Mysqli\Result
+     * @throws \fastorm\Adapter\Driver\DriverException
+     */
     public function doQuery($repository, $queryString, $params = array())
     {
 
         $metadata = $this->loadMetadata($repository);
 
         if (isset($this->connectionConfig[$metadata->getConnection()]) === false) {
-            throw new \RuntimeException(sprintf('Connection "%s" not found', $metadata->getConnection()));
+            throw new DriverException(sprintf('Connection "%s" not found', $metadata->getConnection()));
         }
 
         $connection = $this->connectionConfig[$metadata->getConnection()];
@@ -89,7 +109,7 @@ class Manager
                     $databaseHandler = new \fastorm\Adapter\Driver\Mysqli\Mysqli();
                     break;
                 default:
-                    throw new \RuntimeException($connection['type'] . ' handler not found');
+                    throw new DriverException($connection['type'] . ' handler not found');
                     break;
             }
 
@@ -107,22 +127,18 @@ class Manager
 
         $stmt = $databaseHandler->prepare($queryString);
 
-        if ($databaseHandler->error() !== false) {
-            throw new \Exception($databaseHandler->error());
-        }
-
         if (count($params) > 0) {
             $stmt->bindParams($params);
         }
 
         if ($databaseHandler->error() !== false) {
-            throw new \Exception($databaseHandler->error());
+            QueryException::throwException($queryString, $databaseHandler);
         }
 
         $stmt->execute();
 
         if ($databaseHandler->error() !== false) {
-            throw new \Exception($databaseHandler->error());
+            QueryException::throwException($queryString, $databaseHandler);
         }
 
         $result = $stmt->getResult();

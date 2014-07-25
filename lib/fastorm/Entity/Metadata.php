@@ -2,6 +2,8 @@
 
 namespace fastorm\Entity;
 
+use fastorm\Exception;
+
 class Metadata
 {
 
@@ -51,7 +53,7 @@ class Metadata
     public function addField(array $params)
     {
         if (isset($params['fieldName']) === false || isset($params['columnName']) === false) {
-            throw new \RuntimeException('Field configuration must have fieldName and columnName properties');
+            throw new Exception('Field configuration must have fieldName and columnName properties');
         }
 
         $this->fields[$params['columnName']] = $params;
