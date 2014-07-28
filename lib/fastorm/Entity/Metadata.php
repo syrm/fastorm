@@ -13,42 +13,35 @@ class Metadata
     protected $fields = array();
     protected $primary = array();
 
-
     public function setConnection($connectionName)
     {
         $this->connectionName = $connectionName;
     }
-
 
     public function getConnection()
     {
         return $this->connectionName;
     }
 
-
     public function setDatabase($databaseName)
     {
         $this->databaseName = $databaseName;
     }
-
 
     public function getDatabase()
     {
         return $this->databaseName;
     }
 
-
     public function setTable($tableName)
     {
         $this->table = $tableName;
     }
 
-
     public function getTable()
     {
         return $this->table;
     }
-
 
     public function addField(array $params)
     {
@@ -63,12 +56,10 @@ class Metadata
         }
     }
 
-
     public function getPrimary()
     {
         return $this->primary;
     }
-
 
     public function getFields()
     {

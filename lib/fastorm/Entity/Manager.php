@@ -3,7 +3,6 @@
 namespace fastorm\Entity;
 
 use fastorm\Adapter\Driver\DriverException;
-use fastorm\Adapter\Driver\PreparedQueryException;
 use fastorm\Adapter\Driver\QueryException;
 use fastorm\Exception;
 
@@ -16,12 +15,10 @@ class Manager
     protected $metadataList = array();
     protected $tableToClass = array();
 
-
     protected function __construct(array $config)
     {
         $this->connectionConfig = $config['connections'];
     }
-
 
     public static function getInstance(array $config = array())
     {
@@ -51,7 +48,6 @@ class Manager
         return $this->tableToClass[$table];
     }
 
-
     public function loadConnection($connections)
     {
         $this->connectionConfig = $connections;
@@ -64,6 +60,7 @@ class Manager
     public function getRepository($entityName)
     {
         $className = $entityName . 'Repository';
+
         return new $className($this);
     }
 
@@ -86,9 +83,9 @@ class Manager
     }
 
     /**
-     * @param string $repository
-     * @param string $queryString
-     * @param array $params
+     * @param  string                                  $repository
+     * @param  string                                  $queryString
+     * @param  array                                   $params
      * @return \fastorm\Adapter\Driver\Mysqli\Result
      * @throws \fastorm\Adapter\Driver\DriverException
      */

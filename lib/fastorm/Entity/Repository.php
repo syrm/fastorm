@@ -11,12 +11,10 @@ class Repository
      */
     protected $em;
 
-
     public function __construct(Manager $em)
     {
         $this->em = $em;
     }
-
 
     public function getEntityManager()
     {
@@ -42,8 +40,8 @@ class Repository
     }
 
     /**
-     * @param string $queryString
-     * @param array $params
+     * @param  string                          $queryString
+     * @param  array                           $params
      * @return \fastorm\Adapter\DatabaseResult
      */
     public function query($queryString, $params = array())
@@ -52,7 +50,7 @@ class Repository
     }
 
     /**
-     * @param \fastorm\Adapter\DatabaseResult $result
+     * @param  \fastorm\Adapter\DatabaseResult $result
      * @return Hydrator
      */
     public function hydrate(DatabaseResult $result)

@@ -7,12 +7,10 @@ class Result implements \fastorm\Adapter\DatabaseResult
 
     protected $result = null;
 
-
     public function __construct(\mysqli_result $result)
     {
         $this->result = $result;
     }
-
 
     public function dataSeek($offset)
     {
@@ -20,13 +18,11 @@ class Result implements \fastorm\Adapter\DatabaseResult
 
     }
 
-
     public function fetchArray()
     {
         return $this->result->fetch_array(MYSQLI_NUM);
 
     }
-
 
     public function fetchFields()
     {

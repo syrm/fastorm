@@ -18,12 +18,10 @@ class Statement implements \fastorm\Adapter\DatabaseStatement
 
     }
 
-
     public function setParamsOrder(array $params)
     {
         $this->paramsOrder = $params;
     }
-
 
     public function bindParams(array $params)
     {
@@ -64,13 +62,12 @@ class Statement implements \fastorm\Adapter\DatabaseStatement
         $result = $this->statement->get_result();
         if ($result === false) {
             throw new QueryException($this->statement->error, $this->statement->errno);
-        }elseif($result->num_rows === 0){
+        } elseif ($result->num_rows === 0) {
             throw new NoResultException('No result found');
         }
 
         return new Result($result);
     }
-
 
     public function close()
     {
