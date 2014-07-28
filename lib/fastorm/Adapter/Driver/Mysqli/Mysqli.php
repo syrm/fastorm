@@ -17,13 +17,12 @@ class Mysqli implements Database
      */
     protected $connected = false;
 
-
     public function connect($hostname, $username, $password, $port)
     {
         $driver = new \mysqli_driver();
         $driver->report_mode = MYSQLI_REPORT_STRICT;
 
-        try{
+        try {
             $this->connection = new \mysqli($hostname, $username, $password, null, $port);
             $this->connected = true;
         }Catch(\mysqli_sql_exception $e){
@@ -34,7 +33,6 @@ class Mysqli implements Database
 
     }
 
-
     public function setDatabase($database)
     {
         $this->connection->select_db($database);
@@ -43,7 +41,6 @@ class Mysqli implements Database
             throw new DriverException('Select database error : ' . $this->error(), $this->connection->errno);
         }
     }
-
 
     public function error()
     {
@@ -56,12 +53,10 @@ class Mysqli implements Database
 
     }
 
-
     public function escape($value)
     {
         return $this->connection->real_escape_string($value);
     }
-
 
     public function prepare($sql)
     {
@@ -71,6 +66,7 @@ class Mysqli implements Database
             '/:([a-zA-Z0-9_-]+)/',
             function ($match) use (&$paramsOrder) {
                 $paramsOrder[$match[1]] = null;
+
                 return '?';
             },
             $sql
@@ -78,33 +74,30 @@ class Mysqli implements Database
 
         $mysqliStatement = $this->connection->prepare($sql);
 
-        if($mysqliStatement === false){
+        if ($mysqliStatement === false) {
             QueryException::throwException($sql, $this);
         }
 
         $statement = new Statement($mysqliStatement);
         $statement->setParamsOrder($paramsOrder);
+
         return $statement;
     }
-
 
     public function getInsertId()
     {
         return $this->connection->insert_id;
     }
 
-
     public function getSqlState()
     {
         return $this->connection->sqlstate;
     }
 
-
     public function getErrorNo()
     {
         return $this->connection->errno;
     }
-
 
     public function getErrorMessage()
     {
@@ -119,7 +112,8 @@ class Mysqli implements Database
         return $this->connected;
     }
 
-    public function protectFieldName($field){
+    public function protectFieldName($field)
+    {
         return '`'.$field.'`';
     }
 }

@@ -3,7 +3,6 @@
 namespace fastorm\Entity;
 
 use fastorm\Adapter\Driver\DriverException;
-use fastorm\Adapter\Driver\PreparedQueryException;
 use fastorm\Adapter\Driver\QueryException;
 use fastorm\Exception;
 
@@ -16,12 +15,10 @@ class Manager
     protected $metadataList = array();
     protected $tableToClass = array();
 
-
     protected function __construct(array $config)
     {
         $this->connectionConfig = $config['connections'];
     }
-
 
     public static function getInstance(array $config = array())
     {
@@ -51,7 +48,6 @@ class Manager
         return $this->tableToClass[$table];
     }
 
-
     public function loadConnection($connections)
     {
         $this->connectionConfig = $connections;
@@ -64,6 +60,7 @@ class Manager
     public function getRepository($entityName)
     {
         $className = $entityName . 'Repository';
+
         return new $className($this);
     }
 
@@ -86,9 +83,9 @@ class Manager
     }
 
     /**
-     * @param string $repository
-     * @param string $queryString
-     * @param array $params
+     * @param  string                                  $repository
+     * @param  string                                  $queryString
+     * @param  array                                   $params
      * @return \fastorm\Adapter\Driver\Mysqli\Result
      * @throws \fastorm\Adapter\Driver\DriverException
      */
@@ -126,7 +123,8 @@ class Manager
         return $result;
     }
 
-    public function getDatabaseHandler(Metadata $metadata){
+    public function getDatabaseHandler(Metadata $metadata)
+    {
         $connection = $this->connectionConfig[$metadata->getConnection()];
 
         if (isset($this->connectionList[$metadata->getConnection()]) === false) {
@@ -143,13 +141,15 @@ class Manager
         } else {
             $databaseHandler = $this->connectionList[$metadata->getConnection()];
         }
+
         return $databaseHandler;
     }
 
     /**
      * @param Metadata $metadata
      */
-    private function connectAndSetDatabase(Metadata $metadata){
+    private function connectAndSetDatabase(Metadata $metadata)
+    {
         $connection = $this->connectionConfig[$metadata->getConnection()];
         $databaseHandler = $this->getDatabaseHandler($metadata);
         $databaseHandler->connect(

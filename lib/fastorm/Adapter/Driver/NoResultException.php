@@ -2,7 +2,6 @@
 
 namespace fastorm\Adapter\Driver;
 
-
-class NoResultException extends DriverException{
-
-} 
+class NoResultException extends DriverException
+{
+}

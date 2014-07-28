@@ -14,7 +14,6 @@ class Hydrator implements \Iterator
     protected $iteratorPosition = 0;
     protected $iteratorCurrent = null;
 
-
     public function __construct(Repository $entityRepository, DatabaseResult $result)
     {
         $this->entityManager = $entityRepository->getEntityManager();
@@ -47,7 +46,6 @@ class Hydrator implements \Iterator
         }
     }
 
-
     public function first()
     {
         $this->valid();
@@ -60,7 +58,6 @@ class Hydrator implements \Iterator
         return null;
     }
 
-
     /** iterator **/
 
     public function rewind()
@@ -69,7 +66,6 @@ class Hydrator implements \Iterator
         $this->result->dataSeek(0);
         $this->iteratorPosition = 0;
     }
-
 
     public function valid()
     {
@@ -84,12 +80,10 @@ class Hydrator implements \Iterator
         return false;
     }
 
-
     public function key()
     {
         return $this->iteratorPosition;
     }
-
 
     public function current()
     {
@@ -116,7 +110,6 @@ class Hydrator implements \Iterator
 
         return $objects;
     }
-
 
     public function next()
     {
