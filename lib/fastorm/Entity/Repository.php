@@ -23,7 +23,7 @@ class Repository
 
     /**
      * @param $primaryKeyValue
-     * @return mixed|null
+     * @return Object|null
      */
     public function get($primaryKeyValue)
     {
@@ -36,7 +36,7 @@ class Repository
         $databaseHandler = $this->em->getDatabaseHandler($metadata);
         $fields = array_map(array($databaseHandler, 'protectFieldName'), $fields);
 
-        $sql = 'SELECT '.$databaseHandler->protectFieldName($primaryColumn).', '.
+        $sql = 'SELECT ' . $databaseHandler->protectFieldName($primaryColumn) . ', '.
             implode(', ', $fields).' FROM ' . $metadata->getTable() .
             ' WHERE ' . $databaseHandler->protectFieldName($primaryColumn) . ' = :id LIMIT 1';
 

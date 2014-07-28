@@ -2,7 +2,6 @@
 
 namespace fastorm\Adapter\Driver\Mysqli;
 
-use fastorm\Adapter\Driver\NoResultException;
 use fastorm\Adapter\Driver\QueryException;
 
 class Statement implements \fastorm\Adapter\DatabaseStatement
@@ -54,7 +53,6 @@ class Statement implements \fastorm\Adapter\DatabaseStatement
     /**
      * @return Result
      * @throws \fastorm\Adapter\Driver\QueryException
-     * @throws \fastorm\Adapter\Driver\NoResultException
      */
     public function getResult()
     {
@@ -62,8 +60,6 @@ class Statement implements \fastorm\Adapter\DatabaseStatement
         $result = $this->statement->get_result();
         if ($result === false) {
             throw new QueryException($this->statement->error, $this->statement->errno);
-        } elseif ($result->num_rows === 0) {
-            throw new NoResultException('No result found');
         }
 
         return new Result($result);
