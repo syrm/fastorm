@@ -81,7 +81,6 @@ var_dump($countryRepository->get('FRA'));
 echo str_repeat("-", 40) . "\n";
 echo str_repeat("-", 40) . "\n";
 
-/** Test NoResultException */
 try {
     $cityRepository = $em2->getRepository('\sample\model\City');
     $results = $cityRepository->hydrate(
@@ -95,8 +94,6 @@ try {
         var_dump($result);
         echo str_repeat("-", 40) . "\n";
     }
-} catch (NoResultException $e) {
-    var_dump($e->getMessage());
 } catch (Exception $e) {
     var_dump($e->getMessage());
 }
