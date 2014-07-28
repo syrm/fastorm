@@ -46,8 +46,8 @@ class Repository
     }
 
     /**
-     * @param  string $queryString
-     * @param  array  $params
+     * @param  string                          $queryString
+     * @param  array                           $params
      * @return \fastorm\Adapter\DatabaseResult
      */
     public function query($queryString, $params = array())
