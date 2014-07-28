@@ -68,6 +68,11 @@ class Metadata
 
     public function getFieldsName()
     {
-        return array_map(function ($field) {return $field['columnName'];}, $this->fields);
+        return array_map(
+            function ($field) {
+                return $field['columnName'];
+            },
+            $this->fields
+        );
     }
 }
