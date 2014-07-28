@@ -14,4 +14,5 @@ interface Database
     public function getSqlState();
     public function getErrorNo();
     public function getErrorMessage();
+    public function protectFieldName($fieldName);
 }

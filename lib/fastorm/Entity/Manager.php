@@ -2,6 +2,10 @@
 
 namespace fastorm\Entity;
 
+use fastorm\Adapter\Driver\DriverException;
+use fastorm\Adapter\Driver\QueryException;
+use fastorm\Exception;
+
 class Manager
 {
 
@@ -11,19 +15,17 @@ class Manager
     protected $metadataList = array();
     protected $tableToClass = array();
 
-
     protected function __construct(array $config)
     {
         $this->connectionConfig = $config['connections'];
     }
-
 
     public static function getInstance(array $config = array())
     {
 
         if (self::$instance === null) {
             if (count($config) === 0) {
-                throw new \Exception('First call to EntityManager must pass configuration in parameters');
+                throw new Exception('First call to EntityManager must pass configuration in parameters');
             }
 
             self::$instance = new self($config);
@@ -32,7 +34,10 @@ class Manager
         return self::$instance;
     }
 
-
+    /**
+     * @param $table
+     * @return Model
+     */
     public function getClass($table)
     {
 
@@ -43,20 +48,26 @@ class Manager
         return $this->tableToClass[$table];
     }
 
-
     public function loadConnection($connections)
     {
         $this->connectionConfig = $connections;
     }
 
-
+    /**
+     * @param $entityName
+     * @return Repository
+     */
     public function getRepository($entityName)
     {
         $className = $entityName . 'Repository';
+
         return new $className($this);
     }
 
-
+    /**
+     * @param $repositoryName
+     * @return Metadata
+     */
     public function loadMetadata($repositoryName)
     {
 
@@ -71,16 +82,49 @@ class Manager
         return $this->metadataList[$entityName];
     }
 
-
+    /**
+     * @param  string                                  $repository
+     * @param  string                                  $queryString
+     * @param  array                                   $params
+     * @return \fastorm\Adapter\Driver\Mysqli\Result
+     * @throws \fastorm\Adapter\Driver\DriverException
+     */
     public function doQuery($repository, $queryString, $params = array())
     {
 
         $metadata = $this->loadMetadata($repository);
 
         if (isset($this->connectionConfig[$metadata->getConnection()]) === false) {
-            throw new \RuntimeException(sprintf('Connection "%s" not found', $metadata->getConnection()));
+            throw new DriverException(sprintf('Connection "%s" not found', $metadata->getConnection()));
         }
 
+        $databaseHandler = $this->getDatabaseHandler($metadata);
+        if ($databaseHandler->getConnected() === false) {
+            $this->connectAndSetDatabase($metadata);
+        }
+        $stmt = $databaseHandler->prepare($queryString);
+
+        if (count($params) > 0) {
+            $stmt->bindParams($params);
+        }
+
+        if ($databaseHandler->error() !== false) {
+            QueryException::throwException($queryString, $databaseHandler);
+        }
+
+        $stmt->execute();
+
+        if ($databaseHandler->error() !== false) {
+            QueryException::throwException($queryString, $databaseHandler);
+        }
+
+        $result = $stmt->getResult();
+
+        return $result;
+    }
+
+    public function getDatabaseHandler(Metadata $metadata)
+    {
         $connection = $this->connectionConfig[$metadata->getConnection()];
 
         if (isset($this->connectionList[$metadata->getConnection()]) === false) {
@@ -89,44 +133,31 @@ class Manager
                     $databaseHandler = new \fastorm\Adapter\Driver\Mysqli\Mysqli();
                     break;
                 default:
-                    throw new \RuntimeException($connection['type'] . ' handler not found');
+                    throw new DriverException($connection['type'] . ' handler not found');
                     break;
             }
 
             $this->connectionList[$metadata->getConnection()] = $databaseHandler;
-            $databaseHandler->connect(
-                $connection['host'],
-                $connection['user'],
-                $connection['password'],
-                $connection['port']
-            );
-            $databaseHandler->setDatabase($metadata->getDatabase());
         } else {
             $databaseHandler = $this->connectionList[$metadata->getConnection()];
         }
 
-        $stmt = $databaseHandler->prepare($queryString);
+        return $databaseHandler;
+    }
 
-        if ($databaseHandler->error() !== false) {
-            throw new \Exception($databaseHandler->error());
-        }
-
-        if (count($params) > 0) {
-            $stmt->bindParams($params);
-        }
-
-        if ($databaseHandler->error() !== false) {
-            throw new \Exception($databaseHandler->error());
-        }
-
-        $stmt->execute();
-
-        if ($databaseHandler->error() !== false) {
-            throw new \Exception($databaseHandler->error());
-        }
-
-        $result = $stmt->getResult();
-
-        return $result;
+    /**
+     * @param Metadata $metadata
+     */
+    private function connectAndSetDatabase(Metadata $metadata)
+    {
+        $connection = $this->connectionConfig[$metadata->getConnection()];
+        $databaseHandler = $this->getDatabaseHandler($metadata);
+        $databaseHandler->connect(
+            $connection['host'],
+            $connection['user'],
+            $connection['password'],
+            $connection['port']
+        );
+        $databaseHandler->setDatabase($metadata->getDatabase());
     }
 }
