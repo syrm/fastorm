@@ -3,4 +3,7 @@ namespace fastorm\Adapter\Driver;
 
 use fastorm\Exception;
 
-class DriverException extends Exception{}
+class DriverException extends Exception
+{
+
+}

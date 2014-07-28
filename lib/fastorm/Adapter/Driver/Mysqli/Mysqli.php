@@ -20,7 +20,7 @@ class Mysqli implements Database
 
         try {
             $this->connection = new \mysqli($hostname, $username, $password, null, $port);
-        }catch(\mysqli_sql_exception $e){
+        } catch (\mysqli_sql_exception $e) {
             throw new DriverException('Connect Error : '.$e->getMessage(), $e->getCode());
         }
 

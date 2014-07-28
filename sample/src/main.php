@@ -59,7 +59,8 @@ try {
     $cityRepository = $em2->getRepository('\sample\model\City');
     $results = $cityRepository->hydrate(
         $cityRepository->query(
-            "select * from T_CITY_CIT as c inner join T_COUNTRY_COU as co on (c.cou_code = co.cou_code) where co.cou_code = :code limit 3",
+            "select * from T_CITY_CIT as c inner join T_COUNTRY_COU as co on (c.cou_code = co.cou_code)
+            where co.cou_code = :code limit 3",
             array('code' => 'FRA')
         )
     );
@@ -84,7 +85,8 @@ try {
     $cityRepository = $em2->getRepository('\sample\model\City');
     $results = $cityRepository->hydrate(
         $cityRepository->query(
-            "select * from T_CITY_CIT as c inner join T_COUNTRY_COU as co on (c.cou_code = co.cou_code) where co.cou_code = :code limit 3",
+            "select * from T_CITY_CIT as c inner join T_COUNTRY_COU as co on (c.cou_code = co.cou_code)
+            where co.cou_code = :code limit 3",
             array('code' => 'ZZZ')
         )
     );
@@ -92,7 +94,7 @@ try {
         var_dump($result);
         echo str_repeat("-", 40) . "\n";
     }
-}catch(NoResultException $e){
+} catch (NoResultException $e) {
     var_dump($e->getMessage());
 } catch (Exception $e) {
     var_dump($e->getMessage());
