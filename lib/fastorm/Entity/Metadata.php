@@ -14,37 +14,37 @@ class Metadata
 
     public function setConnection($connectionName)
     {
-        $this->connectionName = $connectionName;
+        $this->connectionName = (string) $connectionName;
     }
 
 
     public function getConnection()
     {
-        return $this->connectionName;
+        return (string) $this->connectionName;
     }
 
 
     public function setDatabase($databaseName)
     {
-        $this->databaseName = $databaseName;
+        $this->databaseName = (string) $databaseName;
     }
 
 
     public function getDatabase()
     {
-        return $this->databaseName;
+        return (string) $this->databaseName;
     }
 
 
     public function setTable($tableName)
     {
-        $this->table = $tableName;
+        $this->table = (string) $tableName;
     }
 
 
     public function getTable()
     {
-        return $this->table;
+        return (string) $this->table;
     }
 
 
