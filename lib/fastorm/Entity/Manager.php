@@ -83,9 +83,9 @@ class Manager
     }
 
     /**
-     * @param  string                                  $repository
-     * @param  string                                  $queryString
-     * @param  array                                   $params
+     * @param  string $repository
+     * @param  string $queryString
+     * @param  array  $params
      * @return \fastorm\Adapter\Driver\Mysqli\Result
      * @throws \fastorm\Adapter\Driver\DriverException
      */
